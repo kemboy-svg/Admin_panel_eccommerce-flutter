@@ -20,7 +20,7 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   Widget _selecteditem = DashboardScreen();
 
-  screenSlector(item) {
+  ScreenNavigate(item) {
     switch (item.route) {
       case DashboardScreen.routeName:
         setState(() {
@@ -77,10 +77,7 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return AdminScaffold(
       backgroundColor: Color.fromARGB(255, 230, 216, 209),
-      appBar: AppBar(
-        backgroundColor: Colors.blue.shade900,
-        title: Text('Admin Management'),
-      ),
+      
       sideBar: SideBar(
         items: [
           AdminMenuItem(
@@ -121,10 +118,37 @@ class _MainScreenState extends State<MainScreen> {
         ],
         selectedRoute: '',
         onSelected: (item) {
-          screenSlector(item);
+          ScreenNavigate(item);
         },
+        header: Container(
+          height: 50,
+          width: double.infinity,
+          color: const Color(0xff444444),
+          child: const Center(
+            child: Text(
+              'Vendor Store',
+              style: TextStyle(
+                color: Colors.white,
+              ),
+            ),
+          ),
+      ),
+
+footer: Container(
+          height: 50,
+          width: double.infinity,
+          color: const Color(0xff444444),
+          child: const Center(
+            child: Text(
+              'Multi-Vendor',
+              style: TextStyle(
+                color: Colors.white,
+              ),
+            ),
+          ),
+),
       ),
       body: _selecteditem,
-    );
+      );
   }
 }
