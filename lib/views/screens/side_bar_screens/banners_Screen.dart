@@ -1,7 +1,8 @@
-
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 class BannerScreen extends StatefulWidget {
   static const String routeName = '\BannerScreen';
@@ -13,6 +14,11 @@ class BannerScreen extends StatefulWidget {
 class _BannerScreenState extends State<BannerScreen> {
   dynamic _image;
 
+  final FirebaseStorage _storage = FirebaseStorage.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  String? fileName;
+
   PickBannerImage() async {
     FilePickerResult? result = await FilePicker.platform
         .pickFiles(allowMultiple: false, type: FileType.image);
@@ -20,9 +26,33 @@ class _BannerScreenState extends State<BannerScreen> {
     if (result != null) {
       setState(() {
         _image = result.files.first.bytes;
+        fileName = result.files.first.name;
       });
     } else {
       // The user did not pick  the image
+    }
+  }
+
+  uploadImageToBanners(dynamic image) async {
+    Reference ref = _storage.ref().child('Banners').child(fileName!);
+    UploadTask uploadTask = ref.putData(_image!);
+
+    TaskSnapshot snapshot = await uploadTask;
+    String downloadurl = await snapshot.ref.getDownloadURL();
+    return downloadurl;
+  }
+
+  upLoadImageTocloudFirestore() async {
+    EasyLoading.show();
+    if (_image != null) {
+      String imageUrl = await uploadImageToBanners(_image);
+      await _firestore
+          .collection('banners')
+          .doc(fileName)
+          .set({'image': imageUrl}).whenComplete(() => EasyLoading.dismiss());
+      setState(() {
+        _image = null;
+      });
     }
   }
 
@@ -61,9 +91,14 @@ class _BannerScreenState extends State<BannerScreen> {
                             borderRadius: BorderRadius.circular(14),
                             border: Border.all(),
                           ),
-                          child: Center(
-                            child: Text('Banners'),
-                          ),
+                          child: _image != null
+                              ? Image.memory(
+                                  _image,
+                                  fit: BoxFit.cover,
+                                )
+                              : Center(
+                                  child: Text('Banner'),
+                                ),
                         ),
                         SizedBox(
                           height: 15,
@@ -85,7 +120,9 @@ class _BannerScreenState extends State<BannerScreen> {
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.orange.shade900),
-                    onPressed: () {},
+                    onPressed: () {
+                      upLoadImageTocloudFirestore();
+                    },
                     child: Text(
                       'Save',
                       style: TextStyle(color: Colors.black),

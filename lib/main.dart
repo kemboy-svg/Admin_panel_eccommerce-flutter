@@ -1,7 +1,22 @@
-import 'package:adminpanel/views/screens/main_Screen.dart';
-import 'package:flutter/material.dart';
+import 'dart:io';
 
-void main() {
+import 'package:adminpanel/views/screens/main_Screen.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+      options: kIsWeb || Platform.isAndroid
+          ? FirebaseOptions(
+              apiKey: "AIzaSyC267F7EwuDsByqfdifERljCDdUzsUt5hM",
+              appId: ":668896192348:web:21a06f9e86d5b4d443c399",
+              messagingSenderId: "668896192348",
+              storageBucket: "eccommerce-app-e3caf.appspot.com",
+              projectId: "eccommerce-app-e3caf")
+          : null);
   runApp(const MyApp());
 }
 
@@ -34,6 +49,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: MainScreen(),
+      builder: EasyLoading.init(),
     );
   }
 }
