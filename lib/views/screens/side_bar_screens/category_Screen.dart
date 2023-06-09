@@ -1,16 +1,54 @@
+import 'package:file_picker/file_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
-class CategoryScreen extends StatelessWidget {
+class CategoryScreen extends StatefulWidget {
   static const String routeName = '\CategoryScreen';
 
+  @override
+  State<CategoryScreen> createState() => _CategoryScreenState();
+}
+
+class _CategoryScreenState extends State<CategoryScreen> {
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
 
-  uploadCategory() {
+  FirebaseStorage _storage = FirebaseStorage.instance;
+
+  String? fileName;
+
+  dynamic _image;
+
+  late String CategoryName;
+
+  PickCategoryImage() async {
+    FilePickerResult? result = await FilePicker.platform
+        .pickFiles(allowMultiple: false, type: FileType.image);
+
+    if (result != null) {
+      setState(() {
+        _image = result.files.first.bytes;
+        fileName = result.files.first.name;
+      });
+    } else {
+      // The user did not pick  the image
+    }
+  }
+
+  uploadCategory() async {
     if (_formkey.currentState!.validate()) {
-      print('ok');
+      String imageUrl = await uploadCategoryImageToStorage(_image);
     } else {
       print('not really');
     }
+  }
+
+  uploadCategoryImageToStorage(dynamic image) async {
+    Reference ref = _storage.ref().child('category/$fileName');
+    UploadTask uploadTask = ref.putData(image!);
+
+    TaskSnapshot snapshot = await uploadTask;
+    String downloadUrl = await snapshot.ref.getDownloadURL();
+    return downloadUrl;
   }
 
   @override
@@ -50,9 +88,14 @@ class CategoryScreen extends StatelessWidget {
                               borderRadius: BorderRadius.circular(14),
                               border: Border.all(),
                             ),
-                            child: Center(
-                              child: Text('Category'),
-                            ),
+                            child: _image != null
+                                ? Image.memory(
+                                    _image,
+                                    fit: BoxFit.cover,
+                                  )
+                                : Center(
+                                    child: Text('Category'),
+                                  ),
                           ),
                           SizedBox(
                             height: 15,
@@ -60,9 +103,11 @@ class CategoryScreen extends StatelessWidget {
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.orange.shade900),
-                            onPressed: () {},
+                            onPressed: () {
+                              PickCategoryImage();
+                            },
                             child: Text(
-                              'Upload',
+                              'Upload Image',
                               style: TextStyle(color: Colors.black),
                             ),
                           ),
@@ -73,6 +118,9 @@ class CategoryScreen extends StatelessWidget {
                       child: SizedBox(
                         width: 200,
                         child: TextFormField(
+                            onChanged: (value) {
+                              CategoryName = value;
+                            },
                             validator: (value) {
                               if (value!.isEmpty) {
                                 return 'Please enter some text';
