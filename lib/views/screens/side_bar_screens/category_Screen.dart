@@ -1,6 +1,9 @@
+import 'package:adminpanel/views/screens/side_bar_screens/widgets/category_widget.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 class CategoryScreen extends StatefulWidget {
   static const String routeName = '\CategoryScreen';
@@ -13,6 +16,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
 
   FirebaseStorage _storage = FirebaseStorage.instance;
+  FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   String? fileName;
 
@@ -35,15 +39,26 @@ class _CategoryScreenState extends State<CategoryScreen> {
   }
 
   uploadCategory() async {
+    EasyLoading.show();
     if (_formkey.currentState!.validate()) {
       String imageUrl = await uploadCategoryImageToStorage(_image);
+      await _firestore.collection('Categories').doc(fileName).set({
+        'image': imageUrl,
+        'category': CategoryName,
+      }).whenComplete(() => EasyLoading.dismiss());
+      {
+        setState(() {
+          _image = null;
+          _formkey.currentState!.reset();
+        });
+      }
     } else {
       print('not really');
     }
   }
 
   uploadCategoryImageToStorage(dynamic image) async {
-    Reference ref = _storage.ref().child('category/$fileName');
+    Reference ref = _storage.ref().child('category').child(fileName!);
     UploadTask uploadTask = ref.putData(image!);
 
     TaskSnapshot snapshot = await uploadTask;
@@ -81,8 +96,8 @@ class _CategoryScreenState extends State<CategoryScreen> {
                       child: Column(
                         children: [
                           Container(
-                            height: 140,
-                            width: 140,
+                            height: 100,
+                            width: 100,
                             decoration: BoxDecoration(
                               color: Colors.grey.shade400,
                               borderRadius: BorderRadius.circular(14),
@@ -149,6 +164,25 @@ class _CategoryScreenState extends State<CategoryScreen> {
                     ),
                   ],
                 ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Divider(
+                    color: Colors.blueGrey.shade900,
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Container(
+                    child: Text(
+                      'Categories',
+                      style: TextStyle(
+                        fontSize: 36,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                CategoryWidget(),
               ],
             ),
           ],

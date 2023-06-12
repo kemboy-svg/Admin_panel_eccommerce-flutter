@@ -3,19 +3,50 @@ import 'package:flutter/material.dart';
 class WithdrawScreen extends StatelessWidget {
   static const String routeName = '\WithdrawScreen';
 
+  Widget _rowheader(String text, int flex) {
+    return Expanded(
+      flex: flex,
+        child: Container(
+      decoration:
+          BoxDecoration(border: Border.all(color: Color.fromARGB(255, 247, 211, 211)),
+          color: const Color.fromARGB(255, 13, 150, 218),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(text,style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),),
+          ),
+    )
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: Container(
-        alignment: Alignment.topLeft,
-        padding: EdgeInsets.all(10),
-        child: Text(
-          'Withdrawals',
-          style: TextStyle(
-              fontSize: 36,
-              fontStyle: FontStyle.normal,
-              fontWeight: FontWeight.w700),
-        ),
+      child: Column(
+        children: [
+          Container(
+            alignment: Alignment.topLeft,
+            padding: EdgeInsets.all(10),
+            child: Text(
+              'Withdrawals',
+              style: TextStyle(
+                  fontSize: 36,
+                  fontStyle: FontStyle.normal,
+                  fontWeight: FontWeight.w700),
+            ),
+          ),
+          Row(
+            children: [
+            _rowheader('Name', 1),
+            _rowheader('Amount', 3),
+            _rowheader('Bank Name', 2),
+            _rowheader('Bank Account', 2),
+            _rowheader('Email', 1),
+            _rowheader('Phone', 1)
+            ],
+          )
+        ],
+      
       ),
     );
   }

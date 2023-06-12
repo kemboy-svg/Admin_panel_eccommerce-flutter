@@ -1,3 +1,4 @@
+import 'package:adminpanel/views/screens/side_bar_screens/widgets/banners_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -84,8 +85,8 @@ class _BannerScreenState extends State<BannerScreen> {
                     child: Column(
                       children: [
                         Container(
-                          height: 140,
-                          width: 140,
+                          height: 100,
+                          width: 100,
                           decoration: BoxDecoration(
                             color: Colors.grey.shade400,
                             borderRadius: BorderRadius.circular(14),
@@ -130,8 +131,21 @@ class _BannerScreenState extends State<BannerScreen> {
                   )
                 ],
               ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Divider(color: Colors.blueGrey.shade900,),
+              ),
+
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  child: Text('Banners',style: TextStyle(fontSize: 36,fontWeight: FontWeight.bold),),
+                ),
+              ),
+              BannerWidget(),
             ],
           ),
+          
         ],
       ),
     );
